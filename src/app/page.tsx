@@ -1,6 +1,13 @@
 import { Suspense } from 'react';
 import { AddTaskForm } from '@/features/tasks/components/add-task-form';
 import { TaskList } from '@/features/tasks/components/task-list';
+import { BriefingSection } from '@/features/ai/components/briefing-section';
+import { getTasks } from '@/features/tasks/actions';
+
+async function BriefingWithTasks() {
+  const tasks = await getTasks();
+  return <BriefingSection tasks={tasks} />;
+}
 
 export default function Home() {
   return (
@@ -10,6 +17,12 @@ export default function Home() {
           <h1 className="text-3xl font-bold tracking-tight">TaskPilot</h1>
           <p className="text-foreground/60 mt-1">Find your ONE Thing. Execute what matters.</p>
         </header>
+
+        <section className="mb-6">
+          <Suspense fallback={null}>
+            <BriefingWithTasks />
+          </Suspense>
+        </section>
 
         <section className="mb-8">
           <AddTaskForm />

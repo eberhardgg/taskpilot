@@ -23,10 +23,11 @@ model Task {
 }
 
 model DailyReview {
-  id              String   @id @default(cuid())
-  date            DateTime @unique
-  oneThingId      String?
-  oneThingCompleted Boolean @default(false)
-  reflection      String?
-  createdAt       DateTime @default(now())
+  id                String   @id @default(cuid())
+  date              DateTime @unique
+  oneThingId        String?
+  oneThingGoal      String?  // Why this task matters - captured during briefing
+  oneThingCompleted Boolean  @default(false)
+  reflection        String?
+  createdAt         DateTime @default(now())
 }

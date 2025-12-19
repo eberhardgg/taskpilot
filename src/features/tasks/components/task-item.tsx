@@ -2,16 +2,25 @@
 
 import { useTransition } from 'react';
 import { Button } from '@/components/ui/button';
-import { toggleTaskComplete, deleteTask } from '../actions';
-import type { Task } from '../types';
+import { toggleTaskComplete, deleteTask, updateTaskTier } from '../actions';
+import type { Task, TaskTier } from '../types';
+
+const TIER_OPTIONS: { value: TaskTier; label: string }[] = [
+  { value: 'one-thing', label: '🎯 ONE Thing' },
+  { value: 'supporting', label: 'Supporting' },
+  { value: 'if-time', label: 'If Time' },
+  { value: 'backlog', label: 'Backlog' },
+];
 
 interface TaskItemProps {
   task: Task;
+  showTierSelect?: boolean;
 }
 
-export function TaskItem({ task }: TaskItemProps) {
+export function TaskItem({ task, showTierSelect = false }: TaskItemProps) {
   const [isToggling, startToggle] = useTransition();
   const [isDeleting, startDelete] = useTransition();
+  const [isUpdatingTier, startUpdateTier] = useTransition();
 
   function handleToggle() {
     startToggle(() => {
@@ -22,6 +31,13 @@ export function TaskItem({ task }: TaskItemProps) {
   function handleDelete() {
     startDelete(() => {
       deleteTask(task.id);
+    });
+  }
+
+  function handleTierChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const newTier = e.target.value as TaskTier;
+    startUpdateTier(() => {
+      updateTaskTier(task.id, newTier);
     });
   }
 
@@ -66,6 +82,26 @@ export function TaskItem({ task }: TaskItemProps) {
           <p className="text-xs text-foreground/50 mt-0.5 truncate">{task.description}</p>
         )}
       </div>
+
+      {showTierSelect && (
+        <select
+          value={task.tier}
+          onChange={handleTierChange}
+          disabled={isUpdatingTier}
+          className={`
+            text-xs px-2 py-1 rounded border border-foreground/10 bg-background
+            focus:outline-none focus:ring-2 focus:ring-foreground/20
+            ${isUpdatingTier ? 'opacity-50' : ''}
+          `}
+          aria-label="Change task tier"
+        >
+          {TIER_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      )}
 
       <Button
         variant="ghost"
